@@ -10,6 +10,10 @@ Image → MiniMax-H3 video → frame selection → common fit → Pixel Snapper 
 
 黒いラブラドールが走るアニメーションを1本、素材と完成品つきで収録している。
 
+## Live preview
+
+![Black Labrador running animation](assets/labrador-run.gif)
+
 - [sample directory](examples/labrador-run/)
 - [13-frame transparent sprite sheet](examples/labrador-run/artifacts/labrador_run_13frames_transparent_reference_palette.png)
 - [Aseprite animation](examples/labrador-run/artifacts/labrador_run_13frames_reference_palette.aseprite)
