@@ -18,6 +18,8 @@ param(
     [string]$SnapperPath,
     [string]$Python = 'python',
     [switch]$Despill,
+    [switch]$WritePixelRefinerHandoff,
+    [switch]$OpenPixelRefiner,
     [switch]$Overwrite
 )
 
@@ -72,6 +74,8 @@ if ($Overwrite) {
         $path = Join-Path $output $name
         if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force }
     }
+    $handoffPath = Join-Path $output 'pixelrefiner_handoff'
+    if (Test-Path -LiteralPath $handoffPath) { Remove-Item -LiteralPath $handoffPath -Recurse -Force }
 }
 
 $raw = Join-Path $output '01_frames_raw'
@@ -100,6 +104,25 @@ if (-not $Palette -and -not $PaletteFile) {
     $PaletteFile = $palettePath
 }
 
+if ($OpenPixelRefiner -and -not $WritePixelRefinerHandoff) {
+    throw '-OpenPixelRefiner requires -WritePixelRefinerHandoff'
+}
+if ($WritePixelRefinerHandoff) {
+    $handoffArguments = @{
+        InputDir = $fitted
+        OutputDir = (Join-Path $output 'pixelrefiner_handoff')
+        KeyColor = $KeyColor
+        Tolerance = $Tolerance
+        Colors = $Colors
+        PixelSize = $PixelSize
+        Overwrite = $Overwrite
+    }
+    if ($PaletteFile) { $handoffArguments.PaletteFile = $PaletteFile }
+    if ($OpenPixelRefiner) { $handoffArguments.Open = $true }
+    & (Join-Path $scriptRoot 'prepare_pixel_refiner_handoff.ps1') @handoffArguments
+    if ($LASTEXITCODE -ne 0) { throw 'prepare_pixel_refiner_handoff.ps1 failed' }
+}
+
 $snapperArguments = @{
     InputDir = $fitted
     OutputDir = $snapped
@@ -126,6 +149,11 @@ Invoke-PythonScript 'prepare_background.py' $removeArguments
 Invoke-PythonScript 'analyze_sprite_sequence.py' @($locked, '--output', (Join-Path $output 'sequence_qc.json'), '--key-color', $KeyColor, '--tolerance', "$Tolerance")
 $sheetColumns = $Columns
 if ($sheetColumns -eq 0) { $sheetColumns = $TargetFrames }
+$qualityGate = Join-Path $output 'quality_gate.json'
+Invoke-PythonScript 'validate_sprite_sequence.py' @($transparent, '--output', $qualityGate, '--expected-count', "$TargetFrames", '--key-color', $KeyColor, '--tolerance', "$Tolerance", '--allow-variable-canvas')
+$contactSheet = Join-Path $output 'quality_contact_sheet.png'
+$contactColumns = [Math]::Min($sheetColumns, 8)
+Invoke-PythonScript 'make_qc_contact_sheet.py' @($transparent, $contactSheet, '--columns', "$contactColumns", '--key-color', $KeyColor, '--tolerance', "$Tolerance")
 Invoke-PythonScript 'make_sprite_sheet.py' @($transparent, $sheet, '--columns', "$sheetColumns", '--background', 'transparent', '--anchor', 'bottom-center', '--preview-scale', '4', '--metadata')
 
 Write-Output "postprocess_complete=$output"

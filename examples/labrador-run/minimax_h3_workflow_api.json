@@ -32,7 +32,7 @@
       "clip": ["128", 0],
       "vae": ["119", 0],
       "first_frame": ["10", 0],
-      "prompt": "The provided image is frame 0 and must match the input image exactly. Use it as the exact side-view pixel-art black Labrador reference. Do not redesign, restyle, resize, or reposition the subject. Preserve one full-body black Labrador facing right, the same sturdy proportions, dark black fur with a few charcoal-gray highlights, floppy ears, broad muzzle, raised tail, four legs, dark outline, and the clearly visible bright red collar. Preserve the exact flat #00ff00 chroma-key green background. Keep the dog centered inside a fixed safe rectangle with generous margins. Lock the camera, scale, perspective, zoom, horizontal position, body length, and body height. The opaque dog bounding box must keep the same width and height in every frame; do not resize, stretch, squash, morph, change perspective, or crop any part of the dog or red collar. Animate only one readable running cycle: alternating front and rear leg strides, gentle tail swing, a small floppy-ear bounce, and a tiny controlled body bob. Keep the head, muzzle, collar, torso, tail, and all paws visible at all times. Return to the exact frame-0 pose at the end for a seamless loop. One continuous 39-frame cycle, static locked camera, no pan, no tilt, no zoom, no cuts, no extra dogs, no scenery, no grass, no floor, no shadow, no text, no logo, and no watermark.",
+      "prompt": "The provided image is frame 0 and must match the input image exactly. Use it as the exact side-view pixel-art reference for one black Labrador wearing a bright red collar. Preserve the same black fur, charcoal highlights, floppy ears, broad muzzle, raised tail, dark outline, proportions, and flat #00ff00 chroma-key background. This is a strict four-leg animation: exactly four visible legs total in every frame, specifically two front legs and two rear legs; never create a fifth leg, duplicate paw, extra limb, detached paw, or merged leg. Keep the dog centered in one fixed safe rectangle with generous margins. Lock camera, scale, perspective, zoom, horizontal position, body length, and body height. Keep the opaque dog bounding box width and height constant; do not resize, stretch, squash, morph, change perspective, or crop any part of the dog or collar. Animate only one readable side-view running cycle: front legs and rear legs alternate in a clean run, the tail swings gently, the floppy ears bounce slightly, and the torso has a tiny controlled bob. Keep the head, muzzle, collar, torso, tail, and all four paws inside the safe rectangle at all times. Do not add scenery or floor. Return to the exact frame-0 pose at the end for a seamless loop. One continuous 39-frame cycle at 640 by 640, static locked camera, no pan, no tilt, no zoom, no cuts, no extra objects, no shadow, no text, no logo, and no watermark.",
       "width": 640,
       "height": 640,
       "length": 39
@@ -63,7 +63,7 @@
   "129": {
     "class_type": "RandomNoise",
     "inputs": {
-      "noise_seed": 608241
+      "noise_seed": 781490
     }
   },
   "125": {

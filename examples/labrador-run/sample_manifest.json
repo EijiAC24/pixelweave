@@ -10,7 +10,7 @@
   "reduced": {
     "frames": 13,
     "selection_strategy": "arc-length",
-    "source_indices": [0, 4, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38]
+    "source_indices": [0, 4, 7, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38]
   },
   "pixel_art": {
     "pixel_size": 10,
@@ -19,8 +19,8 @@
     "anchor": "bottom-center"
   },
   "aseprite": {
-    "frame_width": 75,
-    "frame_height": 73,
+    "frame_width": 76,
+    "frame_height": 71,
     "frame_duration_ms": 125
   }
 }

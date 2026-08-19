@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "strict_loop": {
+      "purpose": "Stable game sprite animation with locked identity and a clean loop.",
+      "invariants": [
+        "The provided image is frame 0 and must match the input image exactly.",
+        "Keep one fixed camera, scale, perspective, safe rectangle, and opaque subject bounding box.",
+        "Keep every important body part visible; never crop, duplicate, merge, or invent limbs.",
+        "Use one shared palette and preserve the reference outline and accessories.",
+        "Return to the exact frame-0 pose at the end for a seamless loop."
+      ],
+      "prompt_suffix": "Static locked camera, no pan, no tilt, no zoom, no cuts, no scenery, no shadow, no text, no logo, and no watermark."
+    },
+    "expressive_action": {
+      "purpose": "Readable action with animation principles while retaining a production-safe silhouette.",
+      "invariants": [
+        "The provided image is frame 0 and must match the input image exactly.",
+        "Keep the same character identity, palette families, outline language, and safe rectangle.",
+        "Keep the common cell and camera stable; allow only controlled squash, stretch, anticipation, overlap, and follow-through.",
+        "Do not let expressive motion crop the silhouette or change the apparent character scale."
+      ],
+      "prompt_suffix": "Emphasize one readable action beat with anticipation, a clear extreme, follow-through, and a controlled settle. No camera movement, cuts, scenery, text, logo, or watermark."
+    }
+  },
+  "benchmarks": [
+    {
+      "id": "run",
+      "profile": "strict_loop",
+      "motion": "one clean run cycle with alternating front and rear limbs, subtle torso bob, and controlled tail or accessory follow-through"
+    },
+    {
+      "id": "dodge_roll",
+      "profile": "expressive_action",
+      "motion": "anticipation crouch, forward jump, compact roll, recovery to the original standing pose"
+    },
+    {
+      "id": "ledge_climb",
+      "profile": "expressive_action",
+      "motion": "jump toward a ledge, hands contact the edge, pull the body up, then settle without changing the character scale"
+    },
+    {
+      "id": "sword_swing",
+      "profile": "expressive_action",
+      "motion": "anticipation, one readable sword arc, brief follow-through, and return to the frame-0 stance"
+    },
+    {
+      "id": "environmental_loop",
+      "profile": "strict_loop",
+      "motion": "animate only the requested water ripple, grass sway, flame flicker, or tree movement while keeping the camera and composition locked"
+    }
+  ]
+}

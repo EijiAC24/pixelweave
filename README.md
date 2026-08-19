@@ -1,55 +1,52 @@
 # Pixelweave
 
-![Sprite pipeline banner](assets/readme-banner.png)
+![Pixelweave banner](assets/readme-banner.png)
 
-画像→動画を、ゲーム向けの安定したピクセルアート・スプライトシートへ変換する小さな再現可能パイプライン。
+Pixelweave is a local, reproducible pipeline for turning a reference image and an image-to-video result into clean game-ready sprite frames, sprite sheets, and editable Aseprite animations.
 
-Image → MiniMax-H3 video → frame selection → common fit → Pixel Snapper → reference palette lock → chroma-key removal → sprite sheet → Aseprite
+`reference image → MiniMax-H3 video → native frames → motion-aware selection → common fit → pixel snap → shared palette → transparent PNGs → QC → sprite sheet → Aseprite`
 
-## サンプル
+## Live sample
 
-黒いラブラドールが走るアニメーションを1本、素材と完成品つきで収録している。
-
-## Live preview
+The repository includes a 13-frame black Labrador running sample. The GIF is a preview; the transparent PNG sheet, frame sequence, QC report, and Aseprite file are the production artifacts.
 
 ![Black Labrador running animation](assets/labrador-run.gif)
 
-- [sample directory](examples/labrador-run/)
-- [13-frame transparent sprite sheet](examples/labrador-run/artifacts/labrador_run_13frames_transparent_reference_palette.png)
+- [Sample directory](examples/labrador-run/)
+- [Transparent sprite sheet](examples/labrador-run/artifacts/labrador_run_13frames_transparent_reference_palette.png)
 - [Aseprite animation](examples/labrador-run/artifacts/labrador_run_13frames_reference_palette.aseprite)
 - [MiniMax-H3 workflow](examples/labrador-run/minimax_h3_workflow_api.json)
 
-## 特徴
+## What it solves
 
-- 39 native framesから、uniform / motion arc-length / loop seamで任意フレーム数へ削減
-- 全フレームの共通foreground boxを使って、キャラの大きさ・足元・見切れを安定化
-- 参照画像から抽出した固定パレットを全フレームに適用し、色のチカチカを抑制
-- 緑背景を最後に透過化し、グリーンのエッジ汚染をdespill
-- PNGスプライトシートとJSONメタデータを生成
-- Aseprite CLIで本物のタイムライン付き`.aseprite`へ変換
+- Reduce a native 39-frame clip to any requested count such as 5, 8, or 13 with uniform, motion arc-length, or loop-aware selection.
+- Keep a common foreground box and bottom anchor so the character does not grow, shrink, slide, or get cropped between frames.
+- Use one palette extracted from the original reference to reduce color flicker and preserve outline colors.
+- Normalize a chroma-key background before snapping, then remove it with optional despill.
+- Inspect the actual frames with numeric quality gates and a labeled contact sheet. A smooth GIF can hide broken silhouettes, blur, duplicate frames, and loop-seam problems.
+- Prepare a batch handoff for [PixelRefiner](https://github.com/HappyOnigiri/PixelRefiner) when grid detection, background cleanup, palette mapping, dithering, or outline repair needs visual control.
+- Export a transparent sheet, JSON manifest, runtime atlas metadata, and an editable Aseprite timeline.
 
-## 必要環境
+## Requirements
 
-- Windows / PowerShell 5.1 or PowerShell 7
+- Windows with PowerShell 5.1 or PowerShell 7
 - Python 3.11+
-- Pillow, PyAV
-- MiniMax-H3が動くComfyUI（動画生成をする場合）
-- Pixel Snapper (`spritefusion-pixel-snapper`)
-- Aseprite（任意。編集可能なアニメーションを書き出す場合）
-
-セットアップ:
+- Pillow and PyAV
+- A local ComfyUI installation with MiniMax-H3 for video generation
+- [SpriteFusion Pixel Snapper](https://github.com/Hugo-Dz/spritefusion-pixel-snapper)
+- Aseprite is optional and only needed for the editable animation handoff
 
 ```powershell
 py -m venv .venv
-\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 ```
 
-## 使い方
+## Quick start
 
-MiniMax-H3のComfyUI APIワークフローで、640×640・39フレームの動画を先に生成する。プロンプトは[こちら](docs/prompting.md)の固定条件を使う。
+Generate a 640×640, 39-frame source video in ComfyUI. Use the [prompt profiles](prompts/animation_profiles.json) and the [MiniMax-H3 prompting guide](docs/prompting.md) to lock the first frame, safe rectangle, camera, subject scale, and action.
 
-動画から13フレームのスプライトシートを作る:
+Then run the deterministic post-processing pipeline:
 
 ```powershell
 .\scripts\run_postprocess.ps1 `
@@ -64,9 +61,22 @@ MiniMax-H3のComfyUI APIワークフローで、640×640・39フレームの動�
   -SnapperPath 'C:\path\to\spritefusion-pixel-snapper.exe'
 ```
 
-`-TargetFrames`は5、8、13などに変更できる。`-Strategy loop`はループのつなぎ目を探してからフレームを抜く。
+The output includes `quality_gate.json` and `quality_contact_sheet.png` before the final `sprite_sheet_transparent.png`. Use `-TargetFrames 5`, `8`, or another value when fewer or more gameplay frames are needed.
 
-Asepriteへ変換:
+For a PixelRefiner pass, create a numbered batch handoff after common fitting:
+
+```powershell
+.\scripts\run_postprocess.ps1 `
+  -Video .\work\input.mp4 `
+  -Reference .\work\reference_640_green.png `
+  -OutputDir .\work\processed `
+  -TargetFrames 13 `
+  -WritePixelRefinerHandoff
+```
+
+Open the generated `pixelrefiner_handoff\README.md`, process all frames in one PixelRefiner session, and bring the numbered transparent PNGs back into the Pixel Snapper / palette-lock / sheet stages. The handoff is intentionally explicit: PixelRefiner is a web app and its upstream project does not document a CLI or API.
+
+To create an editable Aseprite animation:
 
 ```powershell
 .\scripts\run_aseprite_import.ps1 `
@@ -78,20 +88,34 @@ Asepriteへ変換:
   -FrameDurationMs 125
 ```
 
-## 重要な設計
+## Design notes
 
-生成プロンプトでは、入力画像を「frame 0」と明示する。カメラ、キャラの高さ・幅、足元、背景色、safe rectangleを固定し、動かす部位だけを指定する。生成後は、色をフレームごとに再推定しない。参照画像から作った1つのパレットを全フレームに使う。
+Keep the generated video and the game deliverables separate. H3 is responsible for readable motion; the deterministic stages enforce common framing, palette stability, transparent edges, frame count, and sheet layout. For a strict loop, pin frame 0 and require the last pose to return to it. For a more expressive action, allow anticipation, squash, stretch, overlap, and follow-through only inside the same safe rectangle.
 
-詳細は以下:
+See:
 
-- [pipeline design](docs/pipeline.md)
-- [prompting MiniMax-H3](docs/prompting.md)
-- [palette and outline stability](docs/color-stability.md)
+- [Pipeline design](docs/pipeline.md)
+- [Prompt profiles and action benchmarks](docs/prompting.md)
+- [Quality gates](docs/quality-gates.md)
+- [PixelRefiner handoff](docs/pixel-refiner.md)
+- [Palette and outline stability](docs/color-stability.md)
 
-## 注意
+## Japanese / 日本語
 
-MiniMax-H3は同じプロンプトでも出力が変わる。生成動画は素材として扱い、ゲーム投入前にフレームの足元、輪郭、首輪、透過エッジを確認すること。動画生成モデルの再現性を完全に保証するRepoではなく、後処理を再現可能にするRepo。
+Pixelweaveは、参照画像と画像→動画の結果から、ゲーム用のスプライトフレーム、スプライトシート、Asepriteアニメーションをローカルで再現可能な形に整えるパイプラインだよ。
+
+生成動画は素材として扱い、後処理で次を固定する設計になっている。
+
+- 39フレームから5・8・13など任意の枚数へ削減
+- 全フレーム共通の前景ボックスと足元アンカー
+- 参照画像から抽出した固定パレット
+- クロマキー正規化、透過化、デスピル
+- フレーム単体のQCとコンタクトシート
+- PixelRefinerへの番号付き一括ハンドオフ
+- 透過スプライトシート、JSON、Aseprite
+
+詳しい手順は[パイプライン設計](docs/pipeline.md)、[プロンプト](docs/prompting.md)、[品質ゲート](docs/quality-gates.md)、[PixelRefiner連携](docs/pixel-refiner.md)を見てね。
 
 ## License
 
-MIT. MiniMax-H3、ComfyUI、Pixel Snapper、Asepriteはそれぞれのライセンスに従う。
+MIT. MiniMax-H3, ComfyUI, Pixel Snapper, PixelRefiner, and Aseprite remain subject to their own licenses.
