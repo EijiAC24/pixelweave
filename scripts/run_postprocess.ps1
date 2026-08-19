@@ -18,8 +18,6 @@ param(
     [string]$SnapperPath,
     [string]$Python = 'python',
     [switch]$Despill,
-    [switch]$WritePixelRefinerHandoff,
-    [switch]$OpenPixelRefiner,
     [switch]$Overwrite
 )
 
@@ -74,8 +72,6 @@ if ($Overwrite) {
         $path = Join-Path $output $name
         if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force }
     }
-    $handoffPath = Join-Path $output 'pixelrefiner_handoff'
-    if (Test-Path -LiteralPath $handoffPath) { Remove-Item -LiteralPath $handoffPath -Recurse -Force }
 }
 
 $raw = Join-Path $output '01_frames_raw'
@@ -102,25 +98,6 @@ Invoke-PythonScript 'fit_frames_to_canvas.py' @($normalized, $fitted, '--canvas-
 if (-not $Palette -and -not $PaletteFile) {
     Invoke-PythonScript 'extract_reference_palette.py' @($referenceCopy, $palettePath, '--colors', "$Colors", '--key-color', $KeyColor, '--tolerance', "$Tolerance")
     $PaletteFile = $palettePath
-}
-
-if ($OpenPixelRefiner -and -not $WritePixelRefinerHandoff) {
-    throw '-OpenPixelRefiner requires -WritePixelRefinerHandoff'
-}
-if ($WritePixelRefinerHandoff) {
-    $handoffArguments = @{
-        InputDir = $fitted
-        OutputDir = (Join-Path $output 'pixelrefiner_handoff')
-        KeyColor = $KeyColor
-        Tolerance = $Tolerance
-        Colors = $Colors
-        PixelSize = $PixelSize
-        Overwrite = $Overwrite
-    }
-    if ($PaletteFile) { $handoffArguments.PaletteFile = $PaletteFile }
-    if ($OpenPixelRefiner) { $handoffArguments.Open = $true }
-    & (Join-Path $scriptRoot 'prepare_pixel_refiner_handoff.ps1') @handoffArguments
-    if ($LASTEXITCODE -ne 0) { throw 'prepare_pixel_refiner_handoff.ps1 failed' }
 }
 
 $snapperArguments = @{

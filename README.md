@@ -24,7 +24,6 @@ The repository includes a 13-frame black Labrador running sample. The GIF is a p
 - Use one palette extracted from the original reference to reduce color flicker and preserve outline colors.
 - Normalize a chroma-key background before snapping, then remove it with optional despill.
 - Inspect the actual frames with numeric quality gates and a labeled contact sheet. A smooth GIF can hide broken silhouettes, blur, duplicate frames, and loop-seam problems.
-- Prepare a batch handoff for [PixelRefiner](https://github.com/HappyOnigiri/PixelRefiner) when grid detection, background cleanup, palette mapping, dithering, or outline repair needs visual control.
 - Export a transparent sheet, JSON manifest, runtime atlas metadata, and an editable Aseprite timeline.
 
 ## Requirements
@@ -63,19 +62,6 @@ Then run the deterministic post-processing pipeline:
 
 The output includes `quality_gate.json` and `quality_contact_sheet.png` before the final `sprite_sheet_transparent.png`. Use `-TargetFrames 5`, `8`, or another value when fewer or more gameplay frames are needed.
 
-For a PixelRefiner pass, create a numbered batch handoff after common fitting:
-
-```powershell
-.\scripts\run_postprocess.ps1 `
-  -Video .\work\input.mp4 `
-  -Reference .\work\reference_640_green.png `
-  -OutputDir .\work\processed `
-  -TargetFrames 13 `
-  -WritePixelRefinerHandoff
-```
-
-Open the generated `pixelrefiner_handoff\README.md`, process all frames in one PixelRefiner session, and bring the numbered transparent PNGs back into the Pixel Snapper / palette-lock / sheet stages. The handoff is intentionally explicit: PixelRefiner is a web app and its upstream project does not document a CLI or API.
-
 To create an editable Aseprite animation:
 
 ```powershell
@@ -97,7 +83,6 @@ See:
 - [Pipeline design](docs/pipeline.md)
 - [Prompt profiles and action benchmarks](docs/prompting.md)
 - [Quality gates](docs/quality-gates.md)
-- [PixelRefiner handoff](docs/pixel-refiner.md)
 - [Palette and outline stability](docs/color-stability.md)
 
 ## Japanese / 日本語
@@ -111,11 +96,10 @@ Pixelweaveは、参照画像と画像→動画の結果から、ゲーム用の�
 - 参照画像から抽出した固定パレット
 - クロマキー正規化、透過化、デスピル
 - フレーム単体のQCとコンタクトシート
-- PixelRefinerへの番号付き一括ハンドオフ
 - 透過スプライトシート、JSON、Aseprite
 
-詳しい手順は[パイプライン設計](docs/pipeline.md)、[プロンプト](docs/prompting.md)、[品質ゲート](docs/quality-gates.md)、[PixelRefiner連携](docs/pixel-refiner.md)を見てね。
+詳しい手順は[パイプライン設計](docs/pipeline.md)、[プロンプト](docs/prompting.md)、[品質ゲート](docs/quality-gates.md)を見てね。
 
 ## License
 
-MIT. MiniMax-H3, ComfyUI, Pixel Snapper, PixelRefiner, and Aseprite remain subject to their own licenses.
+MIT. MiniMax-H3, ComfyUI, Pixel Snapper, and Aseprite remain subject to their own licenses.

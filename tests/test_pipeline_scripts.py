@@ -10,6 +10,7 @@ SCRIPT_DIR = Path(__file__).parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from make_qc_contact_sheet import main as make_qc_main  # noqa: E402
+from make_gif_preview import main as make_gif_main  # noqa: E402
 from make_sprite_sheet import main as make_sheet_main  # noqa: E402
 from select_frames import choose_arc_length, choose_indices  # noqa: E402
 from validate_sprite_sequence import main as validate_main  # noqa: E402
@@ -116,3 +117,24 @@ def test_quality_gate_reports_common_canvas_and_frame_count(tmp_path: Path, monk
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["quality_gate"] is True
     assert report["gates"]["consistent_canvas"] is True
+
+
+def test_gif_preview_contains_all_frames_and_loops(tmp_path: Path, monkeypatch) -> None:
+    frames = tmp_path / "frames"
+    frames.mkdir()
+    for index in range(4):
+        image = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+        image.putpixel((index, index), (255, 0, 0, 255))
+        image.save(frames / f"frame_{index:04d}.png")
+
+    output = tmp_path / "preview.gif"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["make_gif_preview.py", str(frames), str(output), "--duration-ms", "125"],
+    )
+    make_gif_main()
+
+    with Image.open(output) as gif:
+        assert gif.n_frames == 4
+        assert gif.info["loop"] == 0

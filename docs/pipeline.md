@@ -7,13 +7,12 @@
 3. Select an exact output count. `arc-length` preserves motion changes better than plain uniform sampling; `loop` searches for an internal seam.
 4. Normalize the chroma-key background.
 5. Find the union of all foreground boxes, then crop and fit every frame into one common canvas. This is the step that prevents the character from changing size or being clipped.
-6. Optionally hand the fitted batch to PixelRefiner for visual grid, background, palette, and outline cleanup. Keep the same order and return numbered transparent PNGs.
-7. Run Pixel Snapper with one explicit pixel size and one palette.
-8. Apply the reference palette again after snapping. This second lock is intentional: it removes small per-frame color drift introduced by quantization.
-9. Remove the key background with softness and optional despill.
-10. Run numeric QC and create a labeled contact sheet from the actual output frames.
-11. Pack frames with one cell size and an explicit anchor. Emit a JSON manifest.
-12. Import the sheet into Aseprite as animation frames, preserving approximate source timing.
+6. Run Pixel Snapper with one explicit pixel size and one palette.
+7. Apply the reference palette again after snapping. This second lock is intentional: it removes small per-frame color drift introduced by quantization.
+8. Remove the key background with softness and optional despill.
+9. Run numeric QC and create a labeled contact sheet from the actual output frames.
+10. Pack frames with one cell size and an explicit anchor. Emit a JSON manifest.
+11. Import the sheet into Aseprite as animation frames, preserving approximate source timing.
 
 ## Recommended defaults
 
@@ -50,7 +49,6 @@ The pipeline treats these as contracts:
 05_snapper_10px_16color/
 06_frames_palette_locked/
 07_frames_transparent/
-pixelrefiner_handoff/       # optional, numbered fitted frames + human-entered preset
 quality_gate.json
 quality_contact_sheet.png
 sprite_sheet_transparent.png
