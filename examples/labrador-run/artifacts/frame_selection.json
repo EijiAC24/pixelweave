@@ -1,0 +1,73 @@
+{
+  "native_frames": 39,
+  "selected_frames": 13,
+  "strategy": "arc-length",
+  "loop_seam": null,
+  "frames": [
+    {
+      "output_file": "frame_0000.png",
+      "source_file": "frame_0000.png",
+      "source_index": 0
+    },
+    {
+      "output_file": "frame_0001.png",
+      "source_file": "frame_0004.png",
+      "source_index": 4
+    },
+    {
+      "output_file": "frame_0002.png",
+      "source_file": "frame_0008.png",
+      "source_index": 8
+    },
+    {
+      "output_file": "frame_0003.png",
+      "source_file": "frame_0011.png",
+      "source_index": 11
+    },
+    {
+      "output_file": "frame_0004.png",
+      "source_file": "frame_0014.png",
+      "source_index": 14
+    },
+    {
+      "output_file": "frame_0005.png",
+      "source_file": "frame_0017.png",
+      "source_index": 17
+    },
+    {
+      "output_file": "frame_0006.png",
+      "source_file": "frame_0020.png",
+      "source_index": 20
+    },
+    {
+      "output_file": "frame_0007.png",
+      "source_file": "frame_0023.png",
+      "source_index": 23
+    },
+    {
+      "output_file": "frame_0008.png",
+      "source_file": "frame_0026.png",
+      "source_index": 26
+    },
+    {
+      "output_file": "frame_0009.png",
+      "source_file": "frame_0029.png",
+      "source_index": 29
+    },
+    {
+      "output_file": "frame_0010.png",
+      "source_file": "frame_0032.png",
+      "source_index": 32
+    },
+    {
+      "output_file": "frame_0011.png",
+      "source_file": "frame_0035.png",
+      "source_index": 35
+    },
+    {
+      "output_file": "frame_0012.png",
+      "source_file": "frame_0038.png",
+      "source_index": 38
+    }
+  ]
+}

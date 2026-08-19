@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Local ComfyUI output and model files
+output/
+ComfyUI_windows_portable/
+*.safetensors
+
+# Generated scratch stages. Curated example artifacts stay tracked.
+work/
+tmp/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/

@@ -1,0 +1,26 @@
+{
+  "name": "black-labrador-run",
+  "native": {
+    "width": 640,
+    "height": 640,
+    "frames": 39,
+    "fps": 24,
+    "duration_seconds": 1.625
+  },
+  "reduced": {
+    "frames": 13,
+    "selection_strategy": "arc-length",
+    "source_indices": [0, 4, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38]
+  },
+  "pixel_art": {
+    "pixel_size": 10,
+    "palette_colors": 16,
+    "key_color": "#00ff00",
+    "anchor": "bottom-center"
+  },
+  "aseprite": {
+    "frame_width": 75,
+    "frame_height": 73,
+    "frame_duration_ms": 125
+  }
+}
