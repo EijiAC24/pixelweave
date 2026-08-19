@@ -1,5 +1,7 @@
 # MiniMax-H3 Pixel Sprite Pipeline
 
+![Sprite pipeline banner](assets/readme-banner.png)
+
 MiniMax-H3で作った画像→動画を、ゲーム向けの安定したピクセルアート・スプライトシートへ変換する小さな再現可能パイプライン。
 
 Image → MiniMax-H3 video → frame selection → common fit → Pixel Snapper → reference palette lock → chroma-key removal → sprite sheet → Aseprite
